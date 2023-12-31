@@ -5,10 +5,45 @@ const selectedView = ref(transactionViewOptions[0])
 </script>
 
 <template>
-	<section class="mb-10 flex items-center justify-between">
-		<h1 class="text-4xl font-extrabold">Summary</h1>
-		<div>
-			<USelectMenu v-model="selectedView" :options="transactionViewOptions" />
-		</div>
-	</section>
+	<div>
+		<section class="mb-10 flex items-center justify-between">
+			<h1 class="text-4xl font-extrabold">Summary</h1>
+			<div>
+				<USelectMenu v-model="selectedView" :options="transactionViewOptions" />
+			</div>
+		</section>
+
+		<section
+			class="mb-10 grid grid-cols-1 sm:grid-cols-2 sm:gap-16 lg:grid-cols-4"
+		>
+			<Trend
+				color="green"
+				title="Income"
+				:amount="4000"
+				:last-amount="3000"
+				:loading="false"
+			/>
+			<Trend
+				color="red"
+				title="Income"
+				:amount="4000"
+				:last-amount="3000"
+				:loading="false"
+			/>
+			<Trend
+				color="green"
+				title="Income"
+				:amount="4000"
+				:last-amount="3000"
+				:loading="false"
+			/>
+			<Trend
+				color="green"
+				title="Income"
+				:amount="4000"
+				:last-amount="3000"
+				:loading="true"
+			/>
+		</section>
+	</div>
 </template>
