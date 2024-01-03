@@ -7,7 +7,9 @@ interface Props {
 	loading: boolean
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+
+const { currency } = useCurrency(props.amount)
 </script>
 
 <template>
@@ -16,7 +18,7 @@ defineProps<Props>()
 
 		<div class="mb-2 text-2xl font-extrabold text-black dark:text-white">
 			<USkeleton v-if="loading" class="h-8 w-full" />
-			<div v-else>{{ amount }}</div>
+			<div v-else>{{ currency }}</div>
 		</div>
 
 		<div>
