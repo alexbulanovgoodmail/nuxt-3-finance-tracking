@@ -10,17 +10,32 @@ const selectedView = ref(transactionViewOptions[0])
 
 const supabase = useSupabaseClient()
 
-const { data } = await useAsyncData('transactions', async () => {
-	const { data, error } = await supabase.from('transactions').select()
-
-	if (error) return []
-
-	return data
-})
-
 const transactions = ref<Transaction[] | null>([])
 
-transactions.value = data.value
+const isLoading = ref<boolean>(false)
+
+const fetchTransactions = async () => {
+	isLoading.value = true
+
+	try {
+		const { data } = await useAsyncData('transactions', async () => {
+			const { data, error } = await supabase.from('transactions').select()
+
+			if (error) return []
+
+			return data
+		})
+
+		return data.value
+	} finally {
+		isLoading.value = false
+	}
+}
+
+const refreshTransactions = async () =>
+	(transactions.value = await fetchTransactions())
+
+await refreshTransactions()
 
 const transactionsGroupedByDate = computed(() => {
 	const grouped: Group = {}
@@ -58,32 +73,32 @@ const transactionsGroupedByDate = computed(() => {
 				title="Income"
 				:amount="4000"
 				:last-amount="3000"
-				:loading="false"
+				:loading="isLoading"
 			/>
 			<Trend
 				color="red"
 				title="Expense"
 				:amount="4000"
 				:last-amount="5000"
-				:loading="false"
+				:loading="isLoading"
 			/>
 			<Trend
 				color="green"
 				title="Investments"
 				:amount="4000"
 				:last-amount="3000"
-				:loading="false"
+				:loading="isLoading"
 			/>
 			<Trend
 				color="green"
 				title="Saving"
 				:amount="4000"
 				:last-amount="4100"
-				:loading="false"
+				:loading="isLoading"
 			/>
 		</section>
 
-		<section>
+		<section v-if="!isLoading">
 			<div
 				v-for="(transactionsOnDay, date) in transactionsGroupedByDate"
 				:key="date"
@@ -97,8 +112,12 @@ const transactionsGroupedByDate = computed(() => {
 					v-for="transaction in transactionsOnDay"
 					:key="transaction.id"
 					:transaction="transaction"
+					@deleted="refreshTransactions"
 				/>
 			</div>
+		</section>
+		<section v-else>
+			<USkeleton v-for="i in 4" :key="i" class="mb-2 h-8 w-full" />
 		</section>
 	</div>
 </template>

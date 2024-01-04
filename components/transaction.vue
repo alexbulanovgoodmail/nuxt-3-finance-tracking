@@ -7,6 +7,10 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const emits = defineEmits<{
+	(e: 'deleted', id: number): void
+}>()
+
 const isIncome = computed(() => props.transaction.type === 'Income')
 
 const icon = computed(() =>
@@ -33,6 +37,7 @@ const deleteTransaction = async () => {
 			icon: 'i-heroicons-check-circle',
 			color: 'green'
 		})
+		emits('deleted', props.transaction.id)
 	} catch (error) {
 		toast.add({
 			title: 'Transaction deleted',
