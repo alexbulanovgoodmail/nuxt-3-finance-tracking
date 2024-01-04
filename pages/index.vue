@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import type Transaction from '~/interfaces/Transaction'
-
 import { transactionViewOptions } from '~/constants'
+
+type Group = {
+	[date: string]: Transaction[]
+}
+
 const selectedView = ref(transactionViewOptions[0])
 
 const supabase = useSupabaseClient()
 
-const { data, pending } = await useAsyncData('transactions', async () => {
+const { data } = await useAsyncData('transactions', async () => {
 	const { data, error } = await supabase.from('transactions').select()
 
 	if (error) return []
@@ -17,6 +21,26 @@ const { data, pending } = await useAsyncData('transactions', async () => {
 const transactions = ref<Transaction[] | null>([])
 
 transactions.value = data.value
+
+const transactionsGroupedByDate = computed(() => {
+	const grouped: Group = {}
+
+	if (transactions.value !== null) {
+		for (const transaction of transactions.value) {
+			const date = new Date(transaction.created_at).toISOString().split('T')[0]
+
+			if (!grouped[date]) {
+				grouped[date] = []
+			}
+
+			grouped[date].push(transaction)
+		}
+	}
+
+	return grouped
+})
+
+console.log('transactionsGroupedByDate', transactionsGroupedByDate)
 </script>
 
 <template>
