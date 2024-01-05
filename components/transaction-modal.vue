@@ -14,32 +14,43 @@ const emits = defineEmits<{
 
 const isOpen = computed({
 	get: () => props.modelValue,
-	set: value => emits('update:modelValue', value)
+	set: value => {
+		if (!value) resetForm()
+		emits('update:modelValue', value)
+	}
 })
 
 interface State {
-	type: string
+	type: undefined | string
 	amount: number
 	created_at: undefined | string
 	description: undefined | string
 	category: undefined | string
 }
 
-const form = ref<null | HTMLElement>(null)
+const form = ref<any>(null)
 
-const state = ref<State>({
-	type: 'Income',
+const initialState: State = {
+	type: undefined,
 	amount: 0,
 	created_at: undefined,
 	description: undefined,
 	category: undefined
-})
+}
+
+const state = ref<State>({ ...initialState })
 
 const defaultSchema = z.object({
 	amount: z.number().positive('Amount needs to be more than 0'),
 	created_at: z.string(),
 	description: z.string().optional()
 })
+
+const resetForm = () => {
+	Object.assign(state.value, initialState)
+
+	if (form.value) form.value.clear()
+}
 
 const incomeSchema = z.object({
 	type: z.literal('Income')
@@ -71,6 +82,7 @@ const schema = z.intersection(
 type Schema = z.output<typeof schema>
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
+	if (form.value && form.value.errors.length) return
 	// Do something with data
 	await console.log(event.data)
 }
