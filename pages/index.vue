@@ -10,6 +10,7 @@ const selectedView = ref(transactionViewOptions[0])
 const supabase = useSupabaseClient()
 const transactions = ref<Transaction[] | null>([])
 const isLoading = ref<boolean>(false)
+const isOpen = ref<boolean>(false)
 
 const income = computed(() => {
 	if (transactions.value !== null) {
@@ -129,11 +130,20 @@ const transactionsGroupedByDate = computed(() => {
 				</div>
 			</div>
 			<div>
+				<UModal v-model="isOpen">
+					<UCard>
+						<template #header> Add Transaction </template>
+
+						<div>Hello</div>
+					</UCard>
+				</UModal>
+
 				<UButton
 					icon="i-heroicons-plus-circle"
 					color="white"
 					variant="solid"
 					label="Add"
+					@click="isOpen = true"
 				/>
 			</div>
 		</section>
