@@ -10,6 +10,7 @@ interface Props {
 const props = defineProps<Props>()
 const emits = defineEmits<{
 	(e: 'update:modelValue', value: boolean): void
+	(e: 'saved'): void
 }>()
 
 const isOpen = computed({
@@ -80,11 +81,40 @@ const schema = z.intersection(
 )
 
 type Schema = z.output<typeof schema>
+const isLoading = ref<boolean>(false)
+const supabase = useSupabaseClient()
+const toast = useToast()
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
 	if (form.value && form.value.errors.length) return
-	// Do something with data
-	await console.log(event.data)
+	try {
+		isLoading.value = true
+
+		const { error } = await supabase
+			.from('transactions')
+			.upsert({ ...state.value })
+
+		if (!error) {
+			toast.add({
+				title: 'Transaction saved',
+				icon: 'i-heroicons-check-circle'
+			})
+			isOpen.value = false
+			emits('saved')
+			return
+		}
+
+		throw error
+	} catch (e: any) {
+		toast.add({
+			title: 'Transaction not saved',
+			description: e.message,
+			icon: 'i-heroicons-exclamation-circle',
+			color: 'red'
+		})
+	} finally {
+		isLoading.value = false
+	}
 }
 </script>
 
@@ -151,7 +181,13 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 					/>
 				</UFormGroup>
 
-				<UButton type="submit" color="black" variant="solid" label="Save" />
+				<UButton
+					type="submit"
+					color="black"
+					variant="solid"
+					label="Save"
+					:loading="isLoading"
+				/>
 			</UForm>
 		</UCard>
 	</UModal>

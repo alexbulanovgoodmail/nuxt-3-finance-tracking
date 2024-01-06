@@ -77,17 +77,6 @@ const transactionsGroupedByDate = computed(() => {
 			grouped[date].push(transaction)
 		}
 	}
-
-	// Example of sorting on the client
-
-	// const sortedKeys = Object.keys(grouped).sort().reverse()
-	// const sortedGrouped = {}
-
-	// for (const key of sortedKeys) {
-	// 	sortedGrouped[key] = grouped[key]
-	// }
-
-	// return sortedGrouped
 	return grouped
 })
 </script>
@@ -143,7 +132,7 @@ const transactionsGroupedByDate = computed(() => {
 				</div>
 			</div>
 			<div>
-				<TransactionModal v-model="isOpen" />
+				<TransactionModal v-model="isOpen" @saved="refreshTransactions()" />
 
 				<UButton
 					icon="i-heroicons-plus-circle"
@@ -169,7 +158,7 @@ const transactionsGroupedByDate = computed(() => {
 					v-for="transaction in transactionsOnDay"
 					:key="transaction.id"
 					:transaction="transaction"
-					@deleted="refreshTransactions"
+					@deleted="refreshTransactions()"
 				/>
 			</div>
 		</section>
