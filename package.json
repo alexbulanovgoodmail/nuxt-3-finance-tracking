@@ -11,9 +11,11 @@
 		"lint:js": "eslint --ext \".js,.ts,.vue\" --ignore-path .gitignore .",
 		"lint:style": "stylelint \"**/*.{vue,css}\" --ignore-path .gitignore",
 		"lint": "npm run lint:js && npm run lint:style",
-		"lintfix": "prettier --write --list-different . && npm run lint:js --fix  && npm run lint:style"
+		"lintfix": "prettier --write --list-different . && npm run lint:js --fix  && npm run lint:style",
+		"seed": "node seed.mjs"
 	},
 	"devDependencies": {
+		"@faker-js/faker": "^8.3.1",
 		"@iconify-json/heroicons": "^1.1.15",
 		"@nuxt/devtools": "latest",
 		"@nuxtjs/eslint-config-typescript": "^12.1.0",
