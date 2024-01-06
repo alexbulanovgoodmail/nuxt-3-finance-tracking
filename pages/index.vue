@@ -4,6 +4,9 @@ import { transactionViewOptions } from '~/constants'
 const selectedView = ref(transactionViewOptions[0])
 const isOpen = ref<boolean>(false)
 
+const dates = useSelectedTimePeriod(selectedView)
+
+console.log('dates', dates)
 const {
 	pending,
 	refresh,
