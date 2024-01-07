@@ -11,6 +11,7 @@ export const useFetchTransactions = (period: any) => {
 	const income = computed(() =>
 		transactions.value.filter(t => t.type === 'Income')
 	)
+
 	const expense = computed(() =>
 		transactions.value.filter(t => t.type === 'Expense')
 	)
