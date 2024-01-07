@@ -1,4 +1,18 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const user = useSupabaseUser()
+
+watch(
+	user,
+	user => {
+		if (user) {
+			console.log('Signed in!', user)
+		}
+	},
+	{
+		immediate: true
+	}
+)
+</script>
 
 <template>
 	<header class="mt-10 flex items-center justify-between">
