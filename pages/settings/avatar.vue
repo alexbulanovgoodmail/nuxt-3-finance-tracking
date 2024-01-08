@@ -26,8 +26,6 @@ const saveAvatar = async () => {
 		uploading.value = true
 		const currentAvatarUrl = user.value?.user_metadata?.avatar_url
 
-		console.log('currentAvatarUrl', currentAvatarUrl)
-
 		const { error } = await supabase.storage
 			.from('avatars')
 			.upload(fileName, file)
@@ -41,6 +39,16 @@ const saveAvatar = async () => {
 				avatar_url: fileName
 			}
 		})
+
+		if (currentAvatarUrl) {
+			const { error } = await supabase.storage
+				.from('avatars')
+				.remove([currentAvatarUrl])
+
+			if (error) {
+				throw error
+			}
+		}
 
 		fileInput.value!.input.value = null
 
