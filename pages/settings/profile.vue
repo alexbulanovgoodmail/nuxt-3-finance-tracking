@@ -6,14 +6,21 @@ interface State {
 	email: string | undefined
 }
 
-// const supabase = useSupabaseClient()
+interface Data {
+	data: {
+		full_name: string
+	}
+	email?: string
+}
+
+const supabase = useSupabaseClient()
 const user = useSupabaseUser()
-// const { toastError, toastSuccess } = useAppToast()
+const { toastError, toastSuccess } = useAppToast()
 
 const pending = ref<boolean>(false)
 
 const state = ref<State>({
-	name: '',
+	name: user.value?.user_metadata.full_name || '',
 	email: user.value?.email
 })
 
@@ -22,12 +29,44 @@ const schema = z.object({
 	email: z.string().email()
 })
 
-function handleSubmit(params: type) {}
+const saveProfile = async () => {
+	pending.value = true
+
+	try {
+		const data: Data = {
+			data: {
+				full_name: state.value.name
+			}
+		}
+
+		if (state.value.email !== user.value?.email) {
+			data.email = state.value.email
+		}
+
+		const { error } = await supabase.auth.updateUser(data)
+
+		if (error) {
+			throw error
+		}
+
+		toastSuccess({
+			title: 'Profile update',
+			description: 'Your profile has been updated'
+		})
+	} catch (error: any) {
+		toastError({
+			title: 'Error update profile',
+			description: error.message
+		})
+	} finally {
+		pending.value = false
+	}
+}
 </script>
 
 <template>
 	<div>
-		<UForm :state="state" :schema="schema" @submit="handleSubmit">
+		<UForm :state="state" :schema="schema" @submit="saveProfile">
 			<UFormGroup class="mb-4" label="Full Name" name="name">
 				<UInput v-model="state.name" />
 			</UFormGroup>
