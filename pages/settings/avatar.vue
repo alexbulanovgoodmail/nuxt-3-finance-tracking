@@ -74,7 +74,7 @@ const saveAvatar = async () => {
 				class="w-full"
 				help="This would be blank by default"
 			>
-				<UAvatar :src="url" size="3xl" />
+				<UAvatar v-if="url" :src="url" size="3xl" />
 			</UFormGroup>
 		</div>
 
@@ -85,7 +85,7 @@ const saveAvatar = async () => {
 				name="avatar"
 				help="After choosing an image click Save to actually upload the new avatar"
 			>
-				<UInput type="file" ref="fileInput" />
+				<UInput ref="fileInput" type="file" />
 			</UFormGroup>
 		</div>
 

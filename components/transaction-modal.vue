@@ -2,10 +2,14 @@
 import { z } from 'zod'
 import type { FormSubmitEvent } from '#ui/types'
 import { categories, types } from '~/constants'
+import type Transaction from '~/interfaces/Transaction'
 
 interface Props {
 	modelValue: boolean
+	transaction?: Transaction
 }
+
+const isEditing = computed(() => !!props.transaction)
 
 const props = defineProps<Props>()
 const emits = defineEmits<{
@@ -39,7 +43,17 @@ const initialState: State = {
 	category: undefined
 }
 
-const state = ref<State>({ ...initialState })
+const state = ref<State>(
+	isEditing.value
+		? {
+				type: props.transaction?.type || undefined,
+				amount: props.transaction?.amount || 0,
+				created_at: props.transaction?.created_at.split('T')[0] || undefined,
+				description: props.transaction?.description || undefined,
+				category: props.transaction?.category || undefined
+			}
+		: { ...initialState }
+)
 
 const defaultSchema = z.object({
 	amount: z.number().positive('Amount needs to be more than 0'),
@@ -90,9 +104,10 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 	try {
 		isLoading.value = true
 
-		const { error } = await supabase
-			.from('transactions')
-			.upsert({ ...state.value })
+		const { error } = await supabase.from('transactions').upsert({
+			...state.value,
+			id: props.transaction?.id
+		})
 
 		if (!error) {
 			toastSuccess({
@@ -118,7 +133,9 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 <template>
 	<UModal v-model="isOpen">
 		<UCard>
-			<template #header> Add Transaction </template>
+			<template #header>
+				{{ isEditing ? 'Edit' : 'Add' }} Transaction
+			</template>
 
 			<UForm ref="form" :schema="schema" :state="state" @submit="onSubmit">
 				<UFormGroup
@@ -131,6 +148,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 						v-model="state.type"
 						placeholder="Select the transaction type"
 						:options="types"
+						:disabled="isEditing"
 					/>
 				</UFormGroup>
 
