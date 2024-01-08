@@ -5,7 +5,6 @@ const user = useSupabaseUser()
 const items = [
 	[
 		{
-			label: user.value?.email,
 			slot: 'account',
 			disabled: true
 		}
@@ -42,11 +41,11 @@ const items = [
 					alt="Avatar"
 				/>
 
-				<template #account="{ item }">
+				<template #account="{}">
 					<div class="text-left">
 						<p>Signed in as</p>
 						<p class="font-medium text-gray-900 dark:text-white">
-							{{ item.label }}
+							{{ user.email }}
 						</p>
 					</div>
 				</template>
