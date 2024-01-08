@@ -35,25 +35,23 @@ interface State {
 
 const form = ref<any>(null)
 
-const initialState: State = {
-	type: undefined,
-	amount: 0,
-	created_at: undefined,
-	description: undefined,
-	category: undefined
-}
+const initialState: State = isEditing.value
+	? {
+			type: props.transaction?.type || undefined,
+			amount: props.transaction?.amount || 0,
+			created_at: props.transaction?.created_at.split('T')[0] || undefined,
+			description: props.transaction?.description || undefined,
+			category: props.transaction?.category || undefined
+		}
+	: {
+			type: undefined,
+			amount: 0,
+			created_at: undefined,
+			description: undefined,
+			category: undefined
+		}
 
-const state = ref<State>(
-	isEditing.value
-		? {
-				type: props.transaction?.type || undefined,
-				amount: props.transaction?.amount || 0,
-				created_at: props.transaction?.created_at.split('T')[0] || undefined,
-				description: props.transaction?.description || undefined,
-				category: props.transaction?.category || undefined
-			}
-		: { ...initialState }
-)
+const state = ref<State>({ ...initialState })
 
 const defaultSchema = z.object({
 	amount: z.number().positive('Amount needs to be more than 0'),
