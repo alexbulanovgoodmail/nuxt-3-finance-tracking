@@ -83,7 +83,7 @@ const schema = z.intersection(
 type Schema = z.output<typeof schema>
 const isLoading = ref<boolean>(false)
 const supabase = useSupabaseClient()
-const toast = useToast()
+const { toastSuccess, toastError } = useAppToast()
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
 	if (form.value && form.value.errors.length) return
@@ -95,9 +95,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 			.upsert({ ...state.value })
 
 		if (!error) {
-			toast.add({
-				title: 'Transaction saved',
-				icon: 'i-heroicons-check-circle'
+			toastSuccess({
+				title: 'Transaction saved'
 			})
 			isOpen.value = false
 			emits('saved')
@@ -106,11 +105,9 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
 		throw error
 	} catch (e: any) {
-		toast.add({
+		toastError({
 			title: 'Transaction not saved',
-			description: e.message,
-			icon: 'i-heroicons-exclamation-circle',
-			color: 'red'
+			description: e.message
 		})
 	} finally {
 		isLoading.value = false
